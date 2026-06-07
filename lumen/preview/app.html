@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Lumen · Home</title>
+<style>
+  :root{
+    --brand-400:#5F7DFF; --brand-500:#3D5BFF;
+    --accent-400:#B79CFF; --accent-500:#9B7BFF;
+    --bg-0:#0A0A0B; --bg-1:#111114; --bg-2:#17171B; --bg-3:#1F1F25; --bg-4:#2A2A32;
+    --line-1:#232329; --line-2:#2E2E37;
+    --ink-1:#F5F5F7; --ink-2:#C9C9D1; --ink-3:#8A8A95; --ink-4:#5A5A66;
+    --success:#2ECC71; --warning:#F5A623; --danger:#FF5C5C;
+    --grad-aurora:linear-gradient(135deg,#3D5BFF 0%,#9B7BFF 100%);
+    --ease-in:cubic-bezier(.2,.8,.2,1);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg-0);color:var(--ink-1);font-family:Inter,system-ui,sans-serif;
+            -webkit-font-smoothing:antialiased;line-height:1.5;height:100%}
+  body{display:grid;grid-template-rows:auto 1fr;height:100vh}
+  button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+  input,textarea{font:inherit;color:inherit}
+  ::selection{background:var(--brand-500);color:#fff}
+
+  /* TOP BAR */
+  .topbar{display:flex;align-items:center;justify-content:space-between;height:52px;
+          padding:0 16px;border-bottom:1px solid var(--line-1);background:var(--bg-1)}
+  .topleft{display:flex;align-items:center;gap:12px}
+  .ws{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:var(--bg-2);font-size:13px;color:var(--ink-2);border:1px solid var(--line-1)}
+  .ws .av{width:18px;height:18px;border-radius:5px;background:var(--grad-aurora);font-size:11px;display:grid;place-items:center;color:#fff;font-weight:600}
+  .ws .chev{color:var(--ink-3);font-size:10px}
+  .cmd{flex:1;max-width:520px;margin:0 16px;display:flex;align-items:center;gap:10px;padding:7px 12px;
+       background:var(--bg-2);border:1px solid var(--line-1);border-radius:8px;color:var(--ink-3);font-size:13px;cursor:pointer}
+  .cmd:hover{border-color:var(--line-2);color:var(--ink-2)}
+  .cmd .kbd{margin-left:auto;display:inline-flex;gap:3px}
+  .kbd span{font-family:ui-monospace,monospace;font-size:10.5px;color:var(--ink-3);background:var(--bg-3);border:1px solid var(--line-2);border-bottom-width:2px;padding:1px 5px;border-radius:4px}
+  .topright{display:flex;align-items:center;gap:8px}
+  .avatar{width:28px;height:28px;border-radius:50%;background:var(--bg-3);border:1px solid var(--line-2);display:grid;place-items:center;font-size:11px;font-weight:600;color:var(--ink-1)}
+
+  /* SHELL */
+  .shell{display:grid;grid-template-columns:56px 1fr 420px;height:100%;min-height:0}
+  @media (max-width:1100px){ .shell{grid-template-columns:56px 1fr} .copilot{display:none} }
+  @media (max-width:640px){ .shell{grid-template-columns:1fr} .rail{display:none} }
+
+  /* SIDE RAIL */
+  .rail{padding:14px 8px;border-right:1px solid var(--line-1);background:var(--bg-1);display:flex;flex-direction:column;align-items:center;gap:6px}
+  .rail .icon{width:36px;height:36px;border-radius:8px;display:grid;place-items:center;color:var(--ink-3);transition:all .15s;cursor:pointer;font-size:16px}
+  .rail .icon:hover{color:var(--ink-1);background:var(--bg-3)}
+  .rail .icon.active{color:var(--ink-1);background:var(--bg-3);box-shadow:inset 0 0 0 1px var(--line-2)}
+  .rail .spacer{flex:1}
+
+  /* MAIN */
+  .main{padding:32px 40px;overflow:auto}
+  .pgheader{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:16px}
+  .greeting{font-size:13px;color:var(--ink-3);margin-bottom:4px}
+  .pgtitle{font-size:28px;font-weight:600;letter-spacing:-.02em}
+  .pghead-actions{display:flex;gap:8px}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:500;transition:all .15s;border:1px solid transparent}
+  .btn-sec{color:var(--ink-1);background:var(--bg-2);border-color:var(--line-2)}
+  .btn-sec:hover{background:var(--bg-3)}
+  .btn-pri{color:#fff;background:var(--grad-aurora);box-shadow:0 4px 16px rgba(61,91,255,.3)}
+  .btn-pri:hover{transform:translateY(-1px)}
+
+  /* STATS */
+  .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+  @media (max-width:900px){ .stat-row{grid-template-columns:repeat(2,1fr)} }
+  .stat{background:var(--bg-1);border:1px solid var(--line-1);border-radius:12px;padding:16px;transition:all .2s}
+  .stat:hover{border-color:var(--line-2)}
+  .stat .l{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
+  .stat .v{font-size:24px;font-weight:600;margin-top:6px;letter-spacing:-.02em}
+  .stat .d{font-size:12px;margin-top:4px}
+  .stat .d.up{color:var(--success)}
+  .stat .d.warn{color:var(--warning)}
+
+  /* CARDS */
+  .cards{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+  @media (max-width:900px){ .cards{grid-template-columns:1fr} }
+  .card{background:var(--bg-1);border:1px solid var(--line-1);border-radius:14px;padding:20px;transition:all .2s}
+  .card:hover{border-color:var(--line-2)}
+  .card h3{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:14px}
+  .card h3 .badge{font-size:10px;color:var(--accent-400);background:rgba(155,123,255,.12);padding:2px 8px;border-radius:9999px;font-weight:500;letter-spacing:.05em;text-transform:uppercase}
+  .card p{font-size:14px;color:var(--ink-2);line-height:1.6}
+  .chip-row{margin-top:14px;display:flex;gap:6px;flex-wrap:wrap}
+  .chip{font-size:12px;color:var(--ink-2);background:var(--bg-3);border:1px solid var(--line-2);padding:5px 10px;border-radius:9999px;cursor:pointer;transition:all .15s}
+  .chip:hover{color:var(--ink-1);background:var(--bg-4);border-color:#3a3a45}
+
+  /* TIMELINE */
+  .timeline{margin-top:16px;display:flex;flex-direction:column;gap:12px}
+  .ti{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line-1)}
+  .ti:last-child{border:0}
+  .ti .when{font-size:12px;color:var(--ink-3);width:60px;flex-shrink:0;padding-top:2px}
+  .ti .what{font-size:13.5px;color:var(--ink-1);line-height:1.5}
+  .ti .what .who{color:var(--ink-3);font-size:12px;display:block;margin-top:2px}
+  .ti.now .when{color:var(--accent-400);font-weight:600}
+  .ti .dot{width:8px;height:8px;border-radius:50%;background:var(--bg-3);border:1px solid var(--line-2);flex-shrink:0;margin-top:6px}
+  .ti.now .dot{background:var(--accent-500);box-shadow:0 0 8px var(--accent-500);border-color:transparent}
+
+  /* INBOX list */
+  .inbox-item{padding:12px 0;border-bottom:1px solid var(--line-1);display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s}
+  .inbox-item:hover{background:rgba(255,255,255,.015)}
+  .inbox-item:last-child{border:0}
+  .inbox-item .pre{width:30px;height:30px;border-radius:8px;background:var(--bg-3);display:grid;place-items:center;color:var(--accent-400);font-size:13px;flex-shrink:0}
+  .inbox-item .body{flex:1;min-width:0}
+  .inbox-item .t{font-size:13px;font-weight:500;color:var(--ink-1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .inbox-item .s{font-size:12px;color:var(--ink-3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .inbox-item .meta{font-size:11px;color:var(--ink-4);flex-shrink:0}
+
+  /* COPILOT */
+  .copilot{border-left:1px solid var(--line-1);background:var(--bg-1);display:flex;flex-direction:column;min-height:0}
+  .cop-head{padding:14px 18px;border-bottom:1px solid var(--line-1);display:flex;align-items:center;justify-content:space-between}
+  .cop-title{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-1);font-weight:500}
+  .orb{width:14px;height:14px;border-radius:50%;background:var(--grad-aurora);box-shadow:0 0 12px rgba(155,123,255,.7)}
+  .cop-actions{display:flex;gap:6px}
+  .iconbtn{width:28px;height:28px;border-radius:7px;color:var(--ink-3);display:grid;place-items:center;font-size:14px;transition:all .15s}
+  .iconbtn:hover{color:var(--ink-1);background:var(--bg-3)}
+  .ctx{padding:10px 18px;border-bottom:1px solid var(--line-1);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .ctx .l{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;margin-right:4px}
+  .mem-chip{font-size:11.5px;color:var(--ink-2);background:var(--bg-3);border:1px solid var(--line-2);padding:3px 8px;border-radius:9999px;display:inline-flex;align-items:center;gap:4px}
+  .mem-chip::before{content:"◈";color:var(--accent-400);font-size:10px}
+
+  .stream{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:14px}
+  .msg-user{align-self:flex-end;max-width:90%;background:var(--bg-3);border:1px solid var(--line-2);padding:10px 12px;border-radius:14px 14px 4px 14px;font-size:13.5px;line-height:1.5}
+  .plan{background:var(--bg-2);border:1px solid var(--line-1);border-radius:12px;padding:14px;font-size:13px}
+  .plan-head{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;justify-content:space-between}
+  .plan-step{display:flex;align-items:center;gap:10px;padding:7px 0;color:var(--ink-2);font-size:12.5px;border-bottom:1px dashed var(--line-1)}
+  .plan-step:last-child{border:0}
+  .check{width:14px;height:14px;border-radius:50%;background:var(--success);color:#001;display:grid;place-items:center;font-size:9px;font-weight:700;flex-shrink:0}
+  .spin{width:14px;height:14px;border:2px solid var(--line-2);border-top-color:var(--accent-500);border-radius:50%;animation:spin 700ms linear infinite;flex-shrink:0}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .pending{width:14px;height:14px;border:1px dashed var(--line-2);border-radius:50%;flex-shrink:0}
+  .tool-card{background:var(--bg-2);border:1px solid var(--line-1);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;font-family:ui-monospace,monospace;font-size:12px;color:var(--ink-2)}
+  .tool-card .meta{margin-left:auto;color:var(--ink-3);font-size:11px;font-family:Inter,sans-serif}
+  .approval{background:linear-gradient(180deg, rgba(245,166,35,.08), transparent);
+            border:1px solid rgba(245,166,35,.35);border-radius:12px;padding:14px}
+  .approval .ah{font-size:12px;font-weight:600;color:var(--warning);display:flex;align-items:center;gap:6px;margin-bottom:8px}
+  .approval p{font-size:13px;color:var(--ink-2);margin-bottom:10px}
+  .approval .preview{background:var(--bg-2);border:1px solid var(--line-1);border-radius:8px;padding:10px;font-size:12px;color:var(--ink-2);margin-bottom:10px;max-height:80px;overflow:hidden;position:relative}
+  .approval .preview::after{content:"";position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,var(--bg-2))}
+  .approval .actions{display:flex;gap:6px}
+  .approval .actions button{flex:1;padding:7px;font-size:12px;border-radius:7px;border:1px solid var(--line-2);background:var(--bg-2);color:var(--ink-1)}
+  .approval .actions .approve{background:var(--grad-aurora);border-color:transparent;color:#fff}
+  .msg-asst{font-size:13.5px;color:var(--ink-1);line-height:1.6}
+  .cur{display:inline-block;width:2px;height:14px;background:var(--brand-400);vertical-align:middle;margin-left:2px;box-shadow:0 0 6px var(--brand-400);animation:pulse 1s ease-in-out infinite}
+  @keyframes pulse{50%{opacity:.3}}
+
+  .composer{padding:14px 18px;border-top:1px solid var(--line-1);background:var(--bg-1)}
+  .composer-inner{display:flex;align-items:flex-end;gap:8px;background:var(--bg-2);border:1px solid var(--line-2);border-radius:12px;padding:8px 10px;transition:border-color .15s}
+  .composer-inner:focus-within{border-color:var(--accent-500);box-shadow:0 0 0 3px rgba(155,123,255,.15)}
+  .composer textarea{flex:1;background:transparent;border:0;outline:0;resize:none;max-height:120px;min-height:24px;font-size:13.5px;line-height:1.5;color:var(--ink-1);font-family:inherit}
+  .composer textarea::placeholder{color:var(--ink-4)}
+  .composer .mic, .composer .send{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex-shrink:0;transition:all .15s}
+  .composer .mic{color:var(--ink-3)} .composer .mic:hover{color:var(--ink-1);background:var(--bg-3)}
+  .composer .send{background:var(--grad-aurora);color:#fff;font-size:14px}
+  .composer-hint{font-size:11px;color:var(--ink-4);margin-top:6px;display:flex;justify-content:space-between}
+
+  /* Command palette overlay (decorative) */
+  .palette{position:fixed;inset:0;background:rgba(10,10,11,.6);backdrop-filter:blur(8px);display:none;z-index:100;align-items:flex-start;justify-content:center;padding-top:96px}
+  .palette.open{display:flex}
+  .palette-card{width:min(640px,92vw);background:var(--bg-2);border:1px solid var(--line-2);border-radius:14px;box-shadow:0 24px 64px rgba(0,0,0,.6);overflow:hidden}
+  .pal-input{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line-1)}
+  .pal-input input{flex:1;background:transparent;border:0;outline:0;font-size:15px;color:var(--ink-1)}
+  .pal-section{padding:10px 8px}
+  .pal-section .h{font-size:10.5px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;padding:6px 12px}
+  .pal-item{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:8px;font-size:13.5px;color:var(--ink-2);cursor:pointer}
+  .pal-item:hover, .pal-item.sel{background:var(--bg-3);color:var(--ink-1)}
+  .pal-item .ico{width:18px;color:var(--accent-400);font-size:14px}
+  .pal-item .kbd{margin-left:auto}
+
+  /* Fade in */
+  .fade{animation:fade 400ms var(--ease-in) both}
+  .fade.d1{animation-delay:60ms}.fade.d2{animation-delay:120ms}.fade.d3{animation-delay:180ms}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topleft">
+    <a style="display:flex;align-items:center;gap:8px;padding:0 8px;font-weight:600;letter-spacing:-.02em" href="#">
+      <span class="orb"></span>lumen
+    </a>
+    <div class="ws"><span class="av">A</span>Acme, Inc. <span class="chev">▾</span></div>
+  </div>
+  <div class="cmd" onclick="document.getElementById('pal').classList.add('open')">
+    <span>⌕</span><span>Search or ask anything…</span>
+    <span class="kbd"><span>⌘</span><span>K</span></span>
+  </div>
+  <div class="topright">
+    <button class="iconbtn" title="Help">?</button>
+    <button class="iconbtn" title="Notifications">◐</button>
+    <div class="avatar" title="Ada Founder">A</div>
+  </div>
+</header>
+
+<!-- SHELL -->
+<div class="shell">
+
+  <!-- SIDE RAIL -->
+  <nav class="rail">
+    <button class="icon active" title="Home (⌘1)">⌂</button>
+    <button class="icon" title="Workflows (⌘2)">⚡</button>
+    <button class="icon" title="Memory (⌘3)">◈</button>
+    <button class="icon" title="Inbox (⌘4)">✉</button>
+    <button class="icon" title="Search (⌘5)">⌕</button>
+    <button class="icon" title="Integrations (⌘6)">⊕</button>
+    <div class="spacer"></div>
+    <button class="icon" title="Settings (⌘7)">⚙</button>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="pgheader fade">
+      <div>
+        <div class="greeting">Tuesday, June 9 · 8:42 AM</div>
+        <h1 class="pgtitle">Good morning, Ada. Here's your day.</h1>
+      </div>
+      <div class="pghead-actions">
+        <button class="btn btn-sec">Run morning brief again</button>
+        <button class="btn btn-pri">+ New workflow</button>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stat-row fade d1">
+      <div class="stat"><div class="l">MRR</div><div class="v">$48,212</div><div class="d up">↑ 18.4% vs May</div></div>
+      <div class="stat"><div class="l">Runway</div><div class="v">14 mo</div><div class="d">stable</div></div>
+      <div class="stat"><div class="l">Open loops</div><div class="v">7</div><div class="d warn">2 need your input</div></div>
+      <div class="stat"><div class="l">Hours saved · wk</div><div class="v">6.8h</div><div class="d up">↑ from 5.1 last wk</div></div>
+    </div>
+
+    <div class="cards">
+      <div class="card fade d2">
+        <h3>Morning brief <span class="badge">Lumen</span></h3>
+        <p>
+          You have <b>3 meetings today</b>, including a 1:1 with <b>Sarah Chen</b> (Lightspeed) at 2pm
+          — last conversation was about Q3 pricing strategy. There are <b>12 unread emails</b>, 2 from
+          investors (Maya at Founders Fund, James at SVA). The <b>auth refactor</b> merged overnight ✅;
+          Linear shows the team closed <b>9 issues</b> while you were asleep.
+        </p>
+        <p style="margin-top:10px">
+          One thing to decide today: <b>customer pricing escalation from Loom-Inc.</b> — they're asking
+          for an enterprise discount. I drafted three response options. Want to review?
+        </p>
+        <div class="chip-row">
+          <span class="chip">Draft replies to investors</span>
+          <span class="chip">Prep for Sarah at 2pm</span>
+          <span class="chip">Show me the Loom options</span>
+          <span class="chip">Summarize overnight Linear activity</span>
+          <span class="chip">What changed this week?</span>
+        </div>
+      </div>
+
+      <div class="card fade d2">
+        <h3>Today's calendar</h3>
+        <div class="timeline">
+          <div class="ti"><div class="when">10:00</div><div class="dot"></div><div class="what">Design review · Q3 onboarding<span class="who">w/ Priya, Marcus · 30 min</span></div></div>
+          <div class="ti now"><div class="when">14:00</div><div class="dot"></div><div class="what">1:1 with Sarah Chen<span class="who">Lightspeed · prep ready ↗</span></div></div>
+          <div class="ti"><div class="when">16:30</div><div class="dot"></div><div class="what">Eng standup<span class="who">Team channel · 15 min</span></div></div>
+          <div class="ti" style="opacity:.7"><div class="when">Tomorrow</div><div class="dot"></div><div class="what">Board prep block<span class="who">Lumen-scheduled · 9–10am</span></div></div>
+        </div>
+      </div>
+
+      <div class="card fade d3" style="grid-column:1 / -1">
+        <h3>Inbox · awaiting you</h3>
+        <div class="inbox-item">
+          <div class="pre">⚠</div>
+          <div class="body"><div class="t">Approve: send "Q2 board update" to 4 recipients</div><div class="s">Draft ready · investors@acme.com, board@…</div></div>
+          <div class="meta">2 min ago</div>
+        </div>
+        <div class="inbox-item">
+          <div class="pre">✎</div>
+          <div class="body"><div class="t">Draft: reply to Maya re: bridge round timing</div><div class="s">"Hi Maya — appreciate the heads-up. To your Q on timing…"</div></div>
+          <div class="meta">12 min</div>
+        </div>
+        <div class="inbox-item">
+          <div class="pre">✦</div>
+          <div class="body"><div class="t">Suggestion: schedule retro with Loom-Inc. account</div><div class="s">Last 3 emails show escalating concerns · I can book Thursday</div></div>
+          <div class="meta">36 min</div>
+        </div>
+        <div class="inbox-item">
+          <div class="pre">⚡</div>
+          <div class="body"><div class="t">Workflow finished: weekly investor update draft</div><div class="s">624 words · 3 metric callouts · ready to review</div></div>
+          <div class="meta">1h</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- COPILOT -->
+  <aside class="copilot">
+    <div class="cop-head">
+      <div class="cop-title"><span class="orb"></span>Lumen</div>
+      <div class="cop-actions">
+        <button class="iconbtn" title="New conversation">+</button>
+        <button class="iconbtn" title="History">⊟</button>
+        <button class="iconbtn" title="Close (⌘J)">×</button>
+      </div>
+    </div>
+
+    <div class="ctx">
+      <span class="l">Context</span>
+      <span class="mem-chip">Q3 metrics</span>
+      <span class="mem-chip">Last board deck</span>
+      <span class="mem-chip">Sarah Chen</span>
+      <span class="mem-chip">+4</span>
+    </div>
+
+    <div class="stream">
+      <div class="msg-user">Get me ready for Thursday's board meeting.</div>
+
+      <div class="plan">
+        <div class="plan-head"><span>Plan · 6 steps</span><span>~22s</span></div>
+        <div class="plan-step"><span class="check">✓</span>Find Thursday's board meeting on calendar</div>
+        <div class="plan-step"><span class="check">✓</span>Pull Q3 metrics from Stripe</div>
+        <div class="plan-step"><span class="check">✓</span>Summarize Linear progress since last board</div>
+        <div class="plan-step"><span class="check">✓</span>Identify attendees · last interactions</div>
+        <div class="plan-step"><span class="spin"></span>Draft prep doc in Notion <span style="color:var(--warning);margin-left:auto;font-size:11px">needs approval</span></div>
+        <div class="plan-step"><span class="pending"></span>Schedule 1h prep block tomorrow 9am</div>
+      </div>
+
+      <div class="tool-card"><span class="check">✓</span><span>stripe.get_metrics</span><span>· MRR, churn, runway</span><span class="meta">0.8s</span></div>
+      <div class="tool-card"><span class="check">✓</span><span>linear.list_progress</span><span>· 47 issues</span><span class="meta">0.6s</span></div>
+
+      <div class="approval">
+        <div class="ah">⚠ Approval needed · notion.create_page</div>
+        <p>Lumen wants to create a new page in <b>Notion → Board → Q3 Prep</b>.</p>
+        <div class="preview">
+          <b>Q3 Board Prep · June 11</b><br/>
+          • MRR $48.2k (+18% MoM), gross margin 76%, runway 14mo<br/>
+          • Shipped: auth refactor, billing v2, 3 enterprise pilots signed<br/>
+          • Asks: intros to 2 design candidates, feedback on pricing v3…
+        </div>
+        <div class="actions">
+          <button>Edit</button>
+          <button>Cancel</button>
+          <button class="approve">Approve & continue</button>
+        </div>
+      </div>
+
+      <div class="msg-asst">
+        I'll create the Notion page once you approve, then schedule the prep block.
+        Want me to also draft the talking points as a separate doc<span class="cur"></span>
+      </div>
+    </div>
+
+    <div class="composer">
+      <div class="composer-inner">
+        <textarea rows="1" placeholder="Ask Lumen…  describe an outcome"></textarea>
+        <button class="mic" title="Voice">●</button>
+        <button class="send" title="Send">↑</button>
+      </div>
+      <div class="composer-hint"><span>⌘⏎ to send · ⌘⇧J for new</span><span>gpt-4o · 4 tools active</span></div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- COMMAND PALETTE (decorative, click outside or Esc to close) -->
+<div id="pal" class="palette" onclick="if(event.target.id==='pal')this.classList.remove('open')">
+  <div class="palette-card">
+    <div class="pal-input">
+      <span style="color:var(--ink-3)">⌕</span>
+      <input placeholder="Search or run a command…" />
+      <span class="kbd"><span>esc</span></span>
+    </div>
+    <div class="pal-section">
+      <div class="h">Suggested</div>
+      <div class="pal-item sel"><span class="ico">⚡</span>Draft this week's investor update <span class="kbd"><span>↵</span></span></div>
+      <div class="pal-item"><span class="ico">⚡</span>What's on my calendar today?</div>
+      <div class="pal-item"><span class="ico">⚡</span>Summarize unread emails</div>
+    </div>
+    <div class="pal-section">
+      <div class="h">Go to</div>
+      <div class="pal-item"><span class="ico">⌂</span>Home <span class="kbd"><span>⌘</span><span>1</span></span></div>
+      <div class="pal-item"><span class="ico">⚡</span>Workflows <span class="kbd"><span>⌘</span><span>2</span></span></div>
+      <div class="pal-item"><span class="ico">◈</span>Memory <span class="kbd"><span>⌘</span><span>3</span></span></div>
+      <div class="pal-item"><span class="ico">✉</span>Inbox <span class="kbd"><span>⌘</span><span>4</span></span></div>
+    </div>
+    <div class="pal-section">
+      <div class="h">Actions</div>
+      <div class="pal-item"><span class="ico">⊕</span>Connect integration</div>
+      <div class="pal-item"><span class="ico">⎘</span>Invite teammate</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); document.getElementById('pal').classList.add('open'); }
+    if (e.key === 'Escape') document.getElementById('pal').classList.remove('open');
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root { color-scheme: dark; }
+  html, body { @apply bg-bg-0 text-ink-1 font-sans antialiased; }
+  ::selection { @apply bg-brand-500 text-white; }
+  *:focus-visible { @apply outline-2 outline-offset-2 outline-brand-500; }
+}
+
+@layer utilities {
+  .grad-aurora { background-image: linear-gradient(135deg, #3D5BFF, #9B7BFF); }
+  .grad-dawn { background-image: linear-gradient(135deg, #FF7AB6, #9B7BFF 60%, #3D5BFF); }
+  .grad-text { -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .glass { background: rgba(23,23,27,.65); backdrop-filter: blur(20px) saturate(150%); }
+  .ring-focus { @apply ring-2 ring-brand-500/40 ring-offset-2 ring-offset-bg-0; }
+}

@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Lumen — The AI Chief of Staff for founders</title>
+<meta name="description" content="Describe outcomes. Lumen executes. The AI-native operating system for founders." />
+<style>
+  :root{
+    --brand-400:#5F7DFF; --brand-500:#3D5BFF; --brand-600:#2E47E6;
+    --accent-400:#B79CFF; --accent-500:#9B7BFF;
+    --bg-0:#0A0A0B; --bg-1:#111114; --bg-2:#17171B; --bg-3:#1F1F25; --bg-4:#2A2A32;
+    --line-1:#232329; --line-2:#2E2E37;
+    --ink-1:#F5F5F7; --ink-2:#C9C9D1; --ink-3:#8A8A95; --ink-4:#5A5A66;
+    --success:#2ECC71; --warning:#F5A623; --danger:#FF5C5C;
+    --radius-sm:6px; --radius-md:10px; --radius-lg:14px; --radius-xl:20px; --radius-2xl:28px;
+    --shadow-md:0 4px 12px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.04);
+    --shadow-lg:0 12px 32px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.05);
+    --shadow-xl:0 24px 64px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.06);
+    --grad-aurora:linear-gradient(135deg,#3D5BFF 0%,#9B7BFF 100%);
+    --grad-dawn:linear-gradient(135deg,#FF7AB6 0%,#9B7BFF 60%,#3D5BFF 100%);
+    --ease-in:cubic-bezier(.2,.8,.2,1);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg-0);color:var(--ink-1);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;
+            -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.5}
+  a{color:inherit;text-decoration:none}
+  img,svg{display:block;max-width:100%}
+  ::selection{background:var(--brand-500);color:#fff}
+
+  /* ── Aurora hero background ─────────────────────────────── */
+  .aurora{position:absolute;inset:-20%;z-index:0;filter:blur(80px);opacity:.55;pointer-events:none;
+          background:
+            radial-gradient(40% 30% at 20% 30%, rgba(61,91,255,.55), transparent 60%),
+            radial-gradient(35% 30% at 75% 25%, rgba(155,123,255,.45), transparent 65%),
+            radial-gradient(45% 35% at 50% 80%, rgba(255,122,182,.30), transparent 70%);
+          animation:drift 24s ease-in-out infinite alternate}
+  @keyframes drift{
+    0%{transform:translate(0,0) scale(1)}
+    100%{transform:translate(-3%,2%) scale(1.05)}
+  }
+  .grid-bg{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.35;
+           background-image:
+             linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),
+             linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+           background-size:48px 48px;
+           mask-image:radial-gradient(ellipse 80% 60% at 50% 30%, #000 30%, transparent 80%)}
+
+  /* ── Layout ─────────────────────────────────────────────── */
+  .wrap{max-width:1200px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+
+  /* ── Nav ────────────────────────────────────────────────── */
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(20px) saturate(160%);
+      background:rgba(10,10,11,.65);border-bottom:1px solid var(--line-1)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:18px;letter-spacing:-.02em}
+  .brand .orb{width:18px;height:18px;border-radius:50%;background:var(--grad-aurora);box-shadow:0 0 16px rgba(155,123,255,.8)}
+  .navlinks{display:flex;gap:32px;font-size:14px;color:var(--ink-2)}
+  .navlinks a{transition:color .2s var(--ease-in)}
+  .navlinks a:hover{color:var(--ink-1)}
+  .navcta{display:flex;gap:8px;align-items:center}
+  @media (max-width:768px){ .navlinks{display:none} }
+
+  /* ── Buttons ───────────────────────────────────────────── */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+       padding:10px 16px;border-radius:var(--radius-md);font-size:14px;font-weight:500;
+       border:1px solid transparent;cursor:pointer;transition:all .18s var(--ease-in);white-space:nowrap}
+  .btn-ghost{color:var(--ink-2);background:transparent}
+  .btn-ghost:hover{color:var(--ink-1);background:var(--bg-2)}
+  .btn-secondary{color:var(--ink-1);background:var(--bg-2);border-color:var(--line-2)}
+  .btn-secondary:hover{background:var(--bg-3);border-color:#3a3a45}
+  .btn-primary{color:#fff;background:var(--grad-aurora);box-shadow:0 8px 24px rgba(61,91,255,.35), inset 0 1px 0 rgba(255,255,255,.18)}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 12px 32px rgba(61,91,255,.45), inset 0 1px 0 rgba(255,255,255,.22)}
+  .btn-lg{padding:14px 22px;font-size:15px;border-radius:12px}
+
+  /* ── Hero ───────────────────────────────────────────────── */
+  .hero{position:relative;overflow:hidden;padding:88px 0 120px;text-align:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;font-size:12px;
+           color:var(--ink-2);border:1px solid var(--line-2);border-radius:9999px;
+           background:rgba(23,23,27,.7);backdrop-filter:blur(8px);margin-bottom:24px}
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--brand-400);box-shadow:0 0 8px var(--brand-400)}
+  h1.display{font-size:clamp(40px,7vw,76px);line-height:1.04;letter-spacing:-.035em;font-weight:600;max-width:920px;margin:0 auto}
+  h1 .grad{background:var(--grad-dawn);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{margin:24px auto 36px;max-width:640px;color:var(--ink-2);font-size:18px;line-height:1.55}
+  .hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .hero-meta{margin-top:20px;font-size:13px;color:var(--ink-3)}
+
+  /* ── Hero product mock (the "demo") ──────────────────── */
+  .demo{position:relative;margin:72px auto 0;max-width:980px;border-radius:var(--radius-2xl);
+        background:linear-gradient(180deg, rgba(155,123,255,.18), rgba(61,91,255,.08) 40%, transparent);
+        padding:1px}
+  .demo-inner{border-radius:calc(var(--radius-2xl) - 1px);background:var(--bg-1);
+              box-shadow:var(--shadow-xl);overflow:hidden}
+  .demo-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line-1);background:var(--bg-2)}
+  .dot-r,.dot-y,.dot-g{width:10px;height:10px;border-radius:50%}
+  .dot-r{background:#FF5F57}.dot-y{background:#FEBC2E}.dot-g{background:#28C840}
+  .demo-bar .url{margin-left:12px;font-size:12px;color:var(--ink-3);font-family:ui-monospace,monospace}
+  .demo-body{display:grid;grid-template-columns:56px 1fr 380px;min-height:520px}
+  .rail{padding:16px 8px;border-right:1px solid var(--line-1);background:var(--bg-1);display:flex;flex-direction:column;gap:6px;align-items:center}
+  .rail .icon{width:36px;height:36px;border-radius:8px;display:grid;place-items:center;color:var(--ink-3);transition:all .15s}
+  .rail .icon:hover{color:var(--ink-1);background:var(--bg-3)}
+  .rail .icon.active{color:var(--ink-1);background:var(--bg-3);box-shadow:inset 0 0 0 1px var(--line-2)}
+  .main{padding:24px;overflow:hidden}
+  .copilot{border-left:1px solid var(--line-1);background:var(--bg-1);padding:18px;display:flex;flex-direction:column;gap:12px}
+  @media (max-width:900px){ .demo-body{grid-template-columns:1fr} .rail,.copilot{display:none} }
+
+  .greeting{font-size:13px;color:var(--ink-3)}
+  .pgtitle{font-size:24px;font-weight:600;letter-spacing:-.02em;margin:6px 0 20px}
+  .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+  .stat{background:var(--bg-2);border:1px solid var(--line-1);border-radius:var(--radius-md);padding:14px}
+  .stat .l{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
+  .stat .v{font-size:22px;font-weight:600;margin-top:6px;letter-spacing:-.02em}
+  .stat .d{font-size:11px;color:var(--success);margin-top:2px}
+  .brief{background:var(--bg-2);border:1px solid var(--line-1);border-radius:var(--radius-lg);padding:18px;margin-bottom:12px}
+  .brief h3{font-size:14px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .brief h3 .badge{font-size:10px;color:var(--accent-400);background:rgba(155,123,255,.12);padding:2px 8px;border-radius:9999px;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+  .brief p{font-size:13px;color:var(--ink-2);line-height:1.55}
+  .brief-actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+  .chip{font-size:12px;color:var(--ink-2);background:var(--bg-3);border:1px solid var(--line-2);padding:5px 10px;border-radius:9999px;cursor:pointer;transition:all .15s}
+  .chip:hover{color:var(--ink-1);background:var(--bg-4)}
+
+  /* copilot drawer */
+  .cop-head{display:flex;align-items:center;justify-content:space-between}
+  .cop-title{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)}
+  .cop-title .orb{width:14px;height:14px;border-radius:50%;background:var(--grad-aurora);box-shadow:0 0 10px rgba(155,123,255,.8)}
+  .cop-x{color:var(--ink-3);font-size:18px;cursor:pointer}
+  .msg{font-size:13px;line-height:1.55}
+  .msg.user{align-self:flex-end;background:var(--bg-3);border:1px solid var(--line-2);padding:10px 12px;border-radius:12px 12px 4px 12px;max-width:90%;color:var(--ink-1)}
+  .tool{background:var(--bg-2);border:1px solid var(--line-1);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+  .tool .spin{width:12px;height:12px;border:2px solid var(--line-2);border-top-color:var(--brand-400);border-radius:50%;animation:spin 700ms linear infinite}
+  .tool .check{width:14px;height:14px;border-radius:50%;background:var(--success);color:#001;display:grid;place-items:center;font-size:9px;font-weight:700}
+  .tool .tn{font-family:ui-monospace,monospace;font-size:12px;color:var(--ink-2);flex:1}
+  .tool .meta{font-size:11px;color:var(--ink-3)}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .msg.assistant{color:var(--ink-2)}
+  .msg.assistant .cur{display:inline-block;width:2px;height:14px;background:var(--brand-400);vertical-align:middle;margin-left:2px;box-shadow:0 0 6px var(--brand-400);animation:pulse 1s ease-in-out infinite}
+  @keyframes pulse{50%{opacity:.3}}
+  .composer{margin-top:auto;display:flex;align-items:center;gap:8px;background:var(--bg-2);border:1px solid var(--line-2);border-radius:12px;padding:8px 10px}
+  .composer input{flex:1;background:transparent;border:0;outline:0;color:var(--ink-1);font-size:13px;font-family:inherit}
+  .composer input::placeholder{color:var(--ink-4)}
+  .composer .send{width:28px;height:28px;border-radius:8px;background:var(--grad-aurora);display:grid;place-items:center;color:#fff;font-size:14px}
+
+  /* ── Logo row ─────────────────────────────────────────── */
+  .logos{padding:48px 0;border-top:1px solid var(--line-1);border-bottom:1px solid var(--line-1);text-align:center}
+  .logos .label{font-size:12px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:24px}
+  .logo-row{display:flex;gap:48px;justify-content:center;align-items:center;flex-wrap:wrap;opacity:.7}
+  .logo-row span{font-size:18px;font-weight:600;color:var(--ink-2);letter-spacing:-.01em}
+
+  /* ── Features ─────────────────────────────────────────── */
+  section{padding:120px 0;position:relative}
+  .section-head{text-align:center;max-width:680px;margin:0 auto 64px}
+  .section-eyebrow{font-size:12px;color:var(--accent-400);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px}
+  .section-head h2{font-size:clamp(32px,4.5vw,52px);letter-spacing:-.025em;line-height:1.1;font-weight:600}
+  .section-head p{margin-top:16px;color:var(--ink-2);font-size:17px;line-height:1.55}
+  .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media (max-width:900px){ .feat-grid{grid-template-columns:1fr} }
+  .card{background:var(--bg-1);border:1px solid var(--line-1);border-radius:var(--radius-xl);padding:28px;transition:all .25s var(--ease-in)}
+  .card:hover{border-color:var(--line-2);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+  .card .ico{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;
+             background:linear-gradient(135deg,rgba(61,91,255,.18),rgba(155,123,255,.18));
+             border:1px solid var(--line-2);color:var(--accent-400);margin-bottom:18px}
+  .card h3{font-size:18px;font-weight:600;letter-spacing:-.01em;margin-bottom:8px}
+  .card p{font-size:14px;color:var(--ink-2);line-height:1.55}
+
+  /* Magic moment block */
+  .magic{background:var(--bg-1);border:1px solid var(--line-1);border-radius:var(--radius-2xl);
+         padding:48px;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;
+         position:relative;overflow:hidden}
+  .magic::before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle at 80% 20%, rgba(155,123,255,.18), transparent 50%);pointer-events:none}
+  @media (max-width:900px){ .magic{grid-template-columns:1fr;padding:32px} }
+  .magic .copy h3{font-size:32px;letter-spacing:-.02em;font-weight:600;line-height:1.15}
+  .magic .copy p{margin-top:16px;color:var(--ink-2);font-size:16px;line-height:1.6}
+  .magic .demo-card{position:relative;background:var(--bg-2);border:1px solid var(--line-1);border-radius:var(--radius-lg);padding:18px;font-family:ui-monospace,monospace;font-size:13px}
+  .magic .prompt{color:var(--ink-2);background:var(--bg-3);border:1px solid var(--line-2);border-radius:10px;padding:10px 12px;margin-bottom:14px}
+  .step{display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--ink-2);border-bottom:1px dashed var(--line-1)}
+  .step:last-child{border:0}
+  .step .tick{width:16px;height:16px;border-radius:50%;background:var(--success);color:#001;display:grid;place-items:center;font-size:10px;font-weight:700}
+  .step .running{width:16px;height:16px;border:2px solid var(--line-2);border-top-color:var(--accent-500);border-radius:50%;animation:spin 700ms linear infinite}
+
+  /* Pricing */
+  .price-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  @media (max-width:1000px){ .price-grid{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:600px){ .price-grid{grid-template-columns:1fr} }
+  .tier{background:var(--bg-1);border:1px solid var(--line-1);border-radius:var(--radius-xl);padding:28px;position:relative;display:flex;flex-direction:column}
+  .tier.featured{border-color:transparent;background:linear-gradient(var(--bg-1),var(--bg-1)) padding-box,var(--grad-aurora) border-box;border:1px solid transparent}
+  .tier .name{font-size:13px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.1em}
+  .tier .price{font-size:40px;font-weight:600;letter-spacing:-.02em;margin-top:8px}
+  .tier .price span{font-size:14px;color:var(--ink-3);font-weight:400}
+  .tier ul{list-style:none;margin:20px 0;font-size:14px;color:var(--ink-2)}
+  .tier ul li{padding:8px 0;display:flex;align-items:center;gap:8px}
+  .tier ul li::before{content:"✓";color:var(--success);font-weight:700}
+  .tier .btn{margin-top:auto;width:100%}
+  .tier .ribbon{position:absolute;top:-10px;right:16px;background:var(--grad-aurora);color:#fff;font-size:11px;padding:4px 10px;border-radius:9999px;letter-spacing:.06em;text-transform:uppercase}
+
+  /* CTA */
+  .cta-card{background:linear-gradient(135deg,rgba(61,91,255,.18),rgba(155,123,255,.18));
+            border:1px solid var(--line-2);border-radius:var(--radius-2xl);padding:64px 32px;text-align:center;position:relative;overflow:hidden}
+  .cta-card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 0%, rgba(155,123,255,.25), transparent 60%);pointer-events:none}
+  .cta-card h2{font-size:clamp(28px,4vw,44px);letter-spacing:-.02em;font-weight:600}
+  .cta-card p{margin:14px auto 28px;color:var(--ink-2);max-width:480px}
+
+  /* Footer */
+  footer{padding:64px 0 48px;border-top:1px solid var(--line-1);color:var(--ink-3);font-size:13px}
+  .foot-grid{display:grid;grid-template-columns:2fr repeat(3,1fr);gap:32px}
+  @media (max-width:768px){ .foot-grid{grid-template-columns:1fr 1fr} }
+  .foot-grid h4{font-size:12px;color:var(--ink-2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px}
+  .foot-grid a{display:block;padding:4px 0;color:var(--ink-3);transition:color .15s}
+  .foot-grid a:hover{color:var(--ink-1)}
+  .foot-bottom{margin-top:48px;padding-top:24px;border-top:1px solid var(--line-1);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+
+  /* utility: gradient ring on chip */
+  .ring{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2);padding:5px 10px;border-radius:9999px;background:var(--bg-2);border:1px solid var(--line-2)}
+  .ring::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success)}
+
+  /* fade in on load */
+  .fade{animation:fade 600ms var(--ease-in) both}
+  .fade.d1{animation-delay:80ms}.fade.d2{animation-delay:160ms}.fade.d3{animation-delay:240ms}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#"><span class="orb"></span>lumen</a>
+    <div class="navlinks">
+      <a href="#features">Features</a>
+      <a href="#magic">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#">Changelog</a>
+      <a href="#">Docs</a>
+    </div>
+    <div class="navcta">
+      <a class="btn btn-ghost" href="#">Sign in</a>
+      <a class="btn btn-primary" href="#">Get Lumen →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="aurora"></div>
+  <div class="grid-bg"></div>
+  <div class="wrap">
+    <div class="eyebrow fade"><span class="dot"></span>Seed round · backed by founders who use it daily</div>
+    <h1 class="display fade d1">
+      The AI chief of staff<br/>
+      <span class="grad">that finishes the job.</span>
+    </h1>
+    <p class="lede fade d2">
+      Lumen turns your scattered work — email, docs, meetings, metrics, tasks —
+      into autonomous workflows. Describe an outcome. Lumen executes across your stack.
+    </p>
+    <div class="hero-cta fade d3">
+      <a class="btn btn-primary btn-lg" href="#">Start free — no card</a>
+      <a class="btn btn-secondary btn-lg" href="#">Watch 90-sec demo →</a>
+    </div>
+    <div class="hero-meta fade d3">Free forever for solo founders · SOC 2 in progress · 6 integrations live</div>
+
+    <!-- PRODUCT MOCK -->
+    <div class="demo fade d3" style="animation-delay:.36s">
+      <div class="demo-inner">
+        <div class="demo-bar">
+          <span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span>
+          <span class="url">lumen.app/w/acme/home</span>
+        </div>
+        <div class="demo-body">
+
+          <!-- side rail -->
+          <aside class="rail">
+            <div class="icon active" title="Home">⌂</div>
+            <div class="icon" title="Workflows">⚡</div>
+            <div class="icon" title="Memory">◈</div>
+            <div class="icon" title="Inbox">✉</div>
+            <div class="icon" title="Search">⌕</div>
+            <div class="icon" title="Integrations">⊕</div>
+            <div class="icon" title="Settings">⚙</div>
+          </aside>
+
+          <!-- main -->
+          <div class="main">
+            <div class="greeting">Tuesday, June 9 · Good morning, Ada</div>
+            <div class="pgtitle">Here's your day.</div>
+
+            <div class="stat-row">
+              <div class="stat"><div class="l">MRR</div><div class="v">$48.2k</div><div class="d">+18% vs last mo</div></div>
+              <div class="stat"><div class="l">Runway</div><div class="v">14 mo</div><div class="d">stable</div></div>
+              <div class="stat"><div class="l">Open loops</div><div class="v">7</div><div class="d" style="color:var(--warning)">2 need you</div></div>
+            </div>
+
+            <div class="brief">
+              <h3>Morning brief <span class="badge">Lumen</span></h3>
+              <p>You have <b>3 meetings</b> today, including a 1:1 with Sarah Chen (Lightspeed) at 2pm —
+                 last conversation was about Q3 pricing. <b>12 unread emails</b>, 2 from investors.
+                 The auth refactor shipped overnight ✅. Want me to draft replies and pull together Sarah's prep?</p>
+              <div class="brief-actions">
+                <span class="chip">Draft replies</span>
+                <span class="chip">Prep for Sarah</span>
+                <span class="chip">Summarize Linear</span>
+                <span class="chip">What changed?</span>
+              </div>
+            </div>
+
+            <div class="brief">
+              <h3>This week ahead <span class="badge">Forecast</span></h3>
+              <p>Thursday's board meeting needs prep. Friday is the all-hands.
+                 Lumen has blocked 90 min tomorrow to draft both, pending your approval.</p>
+            </div>
+          </div>
+
+          <!-- copilot -->
+          <aside class="copilot">
+            <div class="cop-head">
+              <div class="cop-title"><span class="orb"></span>Lumen · context: Home</div>
+              <span class="cop-x">×</span>
+            </div>
+            <div class="msg user">Get me ready for Thursday's board meeting.</div>
+            <div class="tool"><span class="check">✓</span><span class="tn">gcal.find_event</span><span class="meta">0.4s</span></div>
+            <div class="tool"><span class="check">✓</span><span class="tn">stripe.get_metrics</span><span class="meta">0.8s</span></div>
+            <div class="tool"><span class="check">✓</span><span class="tn">linear.list_progress</span><span class="meta">0.6s</span></div>
+            <div class="tool"><span class="spin"></span><span class="tn">notion.create_page</span><span class="meta">drafting…</span></div>
+            <div class="msg assistant">
+              Pulling Q3 numbers and Linear deltas. I'll draft the deck outline in Notion and queue
+              a 60-min prep block tomorrow at 9am<span class="cur"></span>
+            </div>
+            <div class="composer">
+              <input placeholder="Ask Lumen…  ⌘J" />
+              <span class="send">↑</span>
+            </div>
+          </aside>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</header>
+
+<!-- LOGOS -->
+<section class="logos" style="padding:48px 0">
+  <div class="wrap">
+    <div class="label">Connects natively with the tools founders already live in</div>
+    <div class="logo-row">
+      <span>Gmail</span><span>Calendar</span><span>Notion</span><span>Linear</span><span>Stripe</span><span>Slack</span><span>GitHub</span>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow">Built for founders</div>
+      <h2>Stop operating your company. Start running it.</h2>
+      <p>Lumen is not another dashboard. It's an autonomous layer above your stack that turns sentences into completed work.</p>
+    </div>
+
+    <div class="feat-grid">
+      <div class="card">
+        <div class="ico">✦</div>
+        <h3>Prompt → Outcome</h3>
+        <p>Describe what you want. Lumen plans the steps, calls the tools, asks for approval on anything risky, and reports back. One prompt replaces 30 clicks.</p>
+      </div>
+      <div class="card">
+        <div class="ico">◈</div>
+        <h3>Persistent memory</h3>
+        <p>Lumen learns your company, your people, your goals, your voice. Every conversation makes the next one better. Edit anything in the memory graph.</p>
+      </div>
+      <div class="card">
+        <div class="ico">⚡</div>
+        <h3>Autonomous agents</h3>
+        <p>Multi-step plans, live tool-call progress, hard approval gates for sends and deletes. Boring and predictable on purpose.</p>
+      </div>
+      <div class="card">
+        <div class="ico">☼</div>
+        <h3>Proactive briefings</h3>
+        <p>Morning, weekly, and pre-meeting briefs delivered without asking. Aggregates across all your tools. Reads like your best chief of staff wrote it.</p>
+      </div>
+      <div class="card">
+        <div class="ico">⌘</div>
+        <h3>Keyboard-first</h3>
+        <p>⌘K to do anything. ⌘J to talk to Lumen. Voice on mobile. Never reach for the mouse during your busiest hour.</p>
+      </div>
+      <div class="card">
+        <div class="ico">⊞</div>
+        <h3>Six integrations, day one</h3>
+        <p>Gmail, Calendar, Notion, Linear, Stripe, Slack. OAuth, scoped, revocable, audited. More shipping every two weeks.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAGIC MOMENT -->
+<section id="magic" style="padding-top:0">
+  <div class="wrap">
+    <div class="magic">
+      <div class="copy">
+        <div class="section-eyebrow">The magic moment</div>
+        <h3>One prompt.<br/>Five tools.<br/>Three hours saved.</h3>
+        <p>The headline interaction: you type an outcome, Lumen orchestrates the plan
+           across your stack, pauses for your approval on anything that sends, deletes,
+           or schedules, and ships the work. You stay in the loop. You never do the busywork.</p>
+        <div style="margin-top:24px;display:flex;gap:8px;flex-wrap:wrap">
+          <span class="ring">5.2s median</span>
+          <span class="ring">98% gross margin</span>
+          <span class="ring">Audit logged</span>
+        </div>
+      </div>
+      <div class="demo-card">
+        <div class="prompt">› get me ready for Thursday's board meeting</div>
+        <div class="step"><span class="tick">✓</span><span>Find Thursday's board meeting on calendar</span></div>
+        <div class="step"><span class="tick">✓</span><span>Pull Q3 metrics from Stripe</span></div>
+        <div class="step"><span class="tick">✓</span><span>Summarize Linear progress since last board</span></div>
+        <div class="step"><span class="tick">✓</span><span>Identify attendees · last interactions</span></div>
+        <div class="step"><span class="running"></span><span>Draft prep doc in Notion · awaiting approval</span></div>
+        <div class="step" style="opacity:.5"><span style="width:16px;height:16px;border:1px dashed var(--line-2);border-radius:50%;display:inline-block"></span><span>Schedule 1h prep block tomorrow 9am</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIAL strip -->
+<section style="padding:80px 0">
+  <div class="wrap">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px" id="quotes"></div>
+  </div>
+  <script>
+    const quotes = [
+      { q:"Lumen replaced my chief of staff hire. We're 6 months ahead of plan because of it.", a:"Maya R.", r:"CEO, fintech (YC W25)" },
+      { q:"The first AI product where I trust the output enough to actually send the email.", a:"Jordan K.", r:"Founder, devtools (Seed)" },
+      { q:"Our weekly investor update went from 3 hours to 12 minutes. The voice is mine, somehow.", a:"Priya S.", r:"COO, marketplace (Series A)" },
+    ];
+    const wrap = document.getElementById('quotes');
+    if (window.innerWidth < 900) wrap.style.gridTemplateColumns='1fr';
+    quotes.forEach(({q,a,r}) => {
+      const el = document.createElement('div');
+      el.className='card';
+      el.innerHTML = `<p style="font-size:16px;line-height:1.5;color:var(--ink-1)">"${q}"</p>
+                      <div style="margin-top:16px;font-size:13px;color:var(--ink-3)"><b style="color:var(--ink-2)">${a}</b> · ${r}</div>`;
+      wrap.appendChild(el);
+    });
+  </script>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" style="padding-top:40px">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow">Pricing</div>
+      <h2>Start free. Pay when Lumen pays you back.</h2>
+      <p>Most founders break even on Pro in the first week. Cancel anytime.</p>
+    </div>
+    <div class="price-grid">
+      <div class="tier">
+        <div class="name">Free</div>
+        <div class="price">$0<span> /forever</span></div>
+        <ul><li>50 AI actions/mo</li><li>2 integrations</li><li>Community support</li></ul>
+        <a class="btn btn-secondary" href="#">Get started</a>
+      </div>
+      <div class="tier featured">
+        <span class="ribbon">Most loved</span>
+        <div class="name">Pro</div>
+        <div class="price">$29<span> /mo</span></div>
+        <ul><li>Unlimited actions</li><li>All 6 integrations</li><li>Briefings + workflows</li><li>Priority support</li></ul>
+        <a class="btn btn-primary" href="#">Start Pro trial</a>
+      </div>
+      <div class="tier">
+        <div class="name">Team</div>
+        <div class="price">$99<span> /seat/mo</span></div>
+        <ul><li>Shared memory</li><li>Roles · audit log</li><li>SSO-lite</li><li>Workflow library</li></ul>
+        <a class="btn btn-secondary" href="#">Start Team trial</a>
+      </div>
+      <div class="tier">
+        <div class="name">Enterprise</div>
+        <div class="price">Custom</div>
+        <ul><li>SAML · SCIM · VPC</li><li>Custom retention</li><li>SOC 2 + DPA</li><li>Dedicated CSM</li></ul>
+        <a class="btn btn-secondary" href="#">Talk to sales</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="padding:60px 0 120px">
+  <div class="wrap">
+    <div class="cta-card">
+      <h2>Your time is the asset.<br/>Lumen protects it.</h2>
+      <p>Set up takes 90 seconds. The first magic moment lands before your coffee gets cold.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary btn-lg" href="#">Start free →</a>
+        <a class="btn btn-secondary btn-lg" href="#">Book a 15-min walkthrough</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a class="brand" href="#"><span class="orb"></span>lumen</a>
+        <p style="margin-top:14px;max-width:320px">The AI chief of staff for founders. Built in San Francisco. Backed by people who needed it themselves.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <a href="#">Features</a><a href="#">Pricing</a><a href="#">Changelog</a><a href="#">Roadmap</a>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a href="#">About</a><a href="#">Careers</a><a href="#">Press</a><a href="#">Contact</a>
+      </div>
+      <div>
+        <h4>Resources</h4>
+        <a href="#">Docs</a><a href="#">API</a><a href="#">Security</a><a href="#">Status</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Lumen Labs, Inc.</span>
+      <span style="display:flex;gap:18px"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">DPA</a></span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
